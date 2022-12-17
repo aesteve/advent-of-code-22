@@ -1,6 +1,4 @@
 use crate::day_3::priority;
-use crate::utils::FileLines;
-use std::collections::{BTreeSet, HashMap};
 
 /// Self-Note: got this one wrong the first time (was only building a global, per 3-lines frequency map)
 /// Using tokens (per line) is easier although maybe not the most elegant solution
