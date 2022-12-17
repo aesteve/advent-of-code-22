@@ -18,7 +18,6 @@ pub(crate) fn count_contained<A, T: IntoIterator<Item = A>>(
 mod tests {
     use crate::day_4::part_1::count_contained;
     use crate::day_4::tests::{parse_line, puzzle_input};
-    use crate::day_4::{parse_ranges, RangePair};
 
     #[test]
     fn solution() {

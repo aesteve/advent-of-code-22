@@ -37,7 +37,7 @@ mod tests {
 
     #[test]
     fn sample_parsing() {
-        let mut sample = sample();
+        let sample = sample();
         let crates = parse(sample, str::to_string);
         let expected = CratesV1 {
             stacks: vec![

@@ -50,7 +50,6 @@ fn parse<C: Crates, L, I: IntoIterator<Item = L>>(file: I, mapping: fn(L) -> Str
     for line in iter {
         let line = mapping(line);
         let capts = line_regex.captures(line.as_str()).unwrap();
-        println!("capts {capts:?}");
         crates.move_crates(
             capts[1].parse::<usize>().unwrap(),
             capts[2].parse::<usize>().unwrap(),
@@ -62,7 +61,6 @@ fn parse<C: Crates, L, I: IntoIterator<Item = L>>(file: I, mapping: fn(L) -> Str
 
 #[cfg(test)]
 mod tests {
-    use crate::day_5::{parse, Crates};
     use crate::utils::{input_file_lines, FileLines};
 
     pub(crate) fn sample() -> Vec<&'static str> {

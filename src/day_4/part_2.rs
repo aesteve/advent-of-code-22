@@ -75,6 +75,6 @@ mod tests {
     fn solution() {
         let lines = puzzle_input();
         let result = count_overlaps(lines, parse_line);
-        assert_eq!(0, result)
+        assert_eq!(895, result)
     }
 }

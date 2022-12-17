@@ -17,7 +17,6 @@ pub(crate) fn badge_sum<A, T: IntoIterator<Item = A>>(lines: T, mapping: fn(A) -
             let tokens = freq_map.get_mut(index).unwrap();
             let token = tokens.get_mut(line_in_grp).unwrap();
             *token = 0;
-            println!("tokens for {c} is {tokens:?}");
             if *tokens == [0; 3] {
                 // encountered once per line so far
                 sum += priority as u64;
