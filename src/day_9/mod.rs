@@ -1,18 +1,13 @@
 use crate::day_9::Direction::{Down, Left, Right, Up};
 
 mod part_1;
+mod part_2;
 mod soluce;
 
 #[derive(Hash, Debug, PartialEq, Eq, Clone, Default)]
 pub(crate) struct Coord {
     pub(crate) x: i64,
     pub(crate) y: i64,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Default)]
-pub(crate) struct State {
-    pub(crate) head: Coord,
-    pub(crate) tail: Coord,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -50,7 +45,7 @@ pub(crate) fn new_coords(start: &Coord, direction: &Direction) -> Coord {
     }
 }
 
-pub(crate) fn eval_tail(origin: &Coord, head_pos: &Coord) -> Coord {
+pub(crate) fn next_pos(origin: &Coord, head_pos: &Coord) -> Coord {
     let d_x = head_pos.x - origin.x;
     let d_y = head_pos.y - origin.y;
     if d_x.abs() > 1 || d_y.abs() > 1 {
@@ -98,7 +93,7 @@ impl TryFrom<String> for Move {
 #[cfg(test)]
 mod tests {
     use crate::day_9::Direction::{Down, Left, Right, Up};
-    use crate::day_9::{eval_tail, Coord, Move};
+    use crate::day_9::{next_pos, Coord, Move};
     use crate::utils::{input_file_lines, FileLines};
 
     pub(crate) fn puzzle_input() -> Vec<Move> {
@@ -151,61 +146,61 @@ mod tests {
     #[test]
     fn tail_doesnt_move_if_not_necessary() {
         let origin = Coord { x: 0, y: 0 };
-        let tail_pos = eval_tail(&origin, &origin);
+        let tail_pos = next_pos(&origin, &origin);
         assert_eq!(tail_pos, origin);
 
-        let tail_pos = eval_tail(&origin, &Coord { x: 1, y: 0 });
+        let tail_pos = next_pos(&origin, &Coord { x: 1, y: 0 });
         assert_eq!(tail_pos, origin);
 
-        let tail_pos = eval_tail(&origin, &Coord { x: 0, y: 1 });
+        let tail_pos = next_pos(&origin, &Coord { x: 0, y: 1 });
         assert_eq!(tail_pos, origin);
 
-        let tail_pos = eval_tail(&origin, &Coord { x: 1, y: 1 });
+        let tail_pos = next_pos(&origin, &Coord { x: 1, y: 1 });
         assert_eq!(tail_pos, origin);
 
-        let tail_pos = eval_tail(&origin, &Coord { x: -1, y: 0 });
+        let tail_pos = next_pos(&origin, &Coord { x: -1, y: 0 });
         assert_eq!(tail_pos, origin);
 
-        let tail_pos = eval_tail(&origin, &Coord { x: 0, y: -1 });
+        let tail_pos = next_pos(&origin, &Coord { x: 0, y: -1 });
         assert_eq!(tail_pos, origin);
 
-        let tail_pos = eval_tail(&origin, &Coord { x: -1, y: -1 });
+        let tail_pos = next_pos(&origin, &Coord { x: -1, y: -1 });
         assert_eq!(tail_pos, origin);
     }
 
     #[test]
     fn tail_follows_head_along_col() {
         let origin = Coord { x: 0, y: 0 };
-        let tail_pos = eval_tail(&origin, &Coord { x: 2, y: 0 });
+        let tail_pos = next_pos(&origin, &Coord { x: 2, y: 0 });
         assert_eq!(tail_pos, Coord { x: 1, y: 0 });
 
-        let tail_pos = eval_tail(&origin, &Coord { x: -2, y: 0 });
+        let tail_pos = next_pos(&origin, &Coord { x: -2, y: 0 });
         assert_eq!(tail_pos, Coord { x: -1, y: 0 });
     }
 
     #[test]
     fn tail_follows_head_along_row() {
         let origin = Coord { x: 0, y: 0 };
-        let tail_pos = eval_tail(&origin, &Coord { x: 0, y: 2 });
+        let tail_pos = next_pos(&origin, &Coord { x: 0, y: 2 });
         assert_eq!(tail_pos, Coord { x: 0, y: 1 });
 
-        let tail_pos = eval_tail(&origin, &Coord { x: 0, y: -2 });
+        let tail_pos = next_pos(&origin, &Coord { x: 0, y: -2 });
         assert_eq!(tail_pos, Coord { x: 0, y: -1 });
     }
 
     #[test]
     fn tail_follows_head_in_diagonal() {
         let origin = Coord { x: 0, y: 0 };
-        let tail_pos = eval_tail(&origin, &Coord { x: 2, y: 2 });
+        let tail_pos = next_pos(&origin, &Coord { x: 2, y: 2 });
         assert_eq!(tail_pos, Coord { x: 1, y: 1 });
 
-        let tail_pos = eval_tail(&origin, &Coord { x: -2, y: -2 });
+        let tail_pos = next_pos(&origin, &Coord { x: -2, y: -2 });
         assert_eq!(tail_pos, Coord { x: -1, y: -1 });
 
-        let tail_pos = eval_tail(&origin, &Coord { x: -2, y: 2 });
+        let tail_pos = next_pos(&origin, &Coord { x: -2, y: 2 });
         assert_eq!(tail_pos, Coord { x: -1, y: 1 });
 
-        let tail_pos = eval_tail(&origin, &Coord { x: 2, y: -2 });
+        let tail_pos = next_pos(&origin, &Coord { x: 2, y: -2 });
         assert_eq!(tail_pos, Coord { x: 1, y: -1 });
     }
 
