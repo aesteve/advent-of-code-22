@@ -1,7 +1,9 @@
+use std::cmp;
 use std::collections::VecDeque;
 
 mod parse;
 mod part_1;
+mod part_2;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct Monkey {
@@ -51,10 +53,10 @@ pub(crate) struct Thrown {
 impl Monkey {
     // What makes a problem extremely hard in Rust is that we can't mutate an iterator while trying to index it
     // so we need to reset self.items after having called this method
-    pub(crate) fn eval_round(&self) -> Vec<Thrown> {
+    pub(crate) fn eval_round(&self, worry_concern: &impl Fn(u64) -> u64) -> Vec<Thrown> {
         let mut res = vec![];
         for item in &self.items {
-            res.push(self.inspect(item));
+            res.push(self.inspect(item, worry_concern));
         }
         res
     }
@@ -63,9 +65,9 @@ impl Monkey {
         self.items.push(item);
     }
 
-    fn inspect(&self, item: &u64) -> Thrown {
+    fn inspect(&self, item: &u64, worry_concern: &impl Fn(u64) -> u64) -> Thrown {
         let mut new_value = self.exec_op(*item);
-        new_value /= 3;
+        new_value = worry_concern(new_value);
         if self.test_outcome(new_value) {
             Thrown {
                 item: new_value,
@@ -91,6 +93,36 @@ impl Monkey {
     fn test_outcome(&self, value: u64) -> bool {
         value % self.test_divisible_by == 0
     }
+}
+
+pub(crate) fn exec_round(monkeys: &mut Vec<Monkey>, worry_concern: &impl Fn(u64) -> u64) {
+    let len = monkeys.len();
+    for i in 0..len {
+        let monkey = monkeys.get(i).unwrap();
+        let thrown = monkey.eval_round(worry_concern);
+        for t in thrown {
+            monkeys.get_mut(t.to).unwrap().add_item(t.item)
+        }
+        let mut monkey = monkeys.get_mut(i).unwrap();
+        monkey.items_inspected += monkey.items.len() as u64;
+        monkey.items.clear();
+    }
+}
+
+pub(crate) fn exec_rounds(
+    rounds: usize,
+    monkeys: &mut Vec<Monkey>,
+    worry_concern: &impl Fn(u64) -> u64,
+) -> u64 {
+    for _ in 0..rounds {
+        exec_round(monkeys, &worry_concern);
+    }
+    let mut items = monkeys
+        .iter()
+        .map(|monkey| monkey.items_inspected)
+        .collect::<Vec<_>>();
+    items.sort_by_key(|&c| cmp::Reverse(c));
+    items.iter().take(2).product()
 }
 
 #[cfg(test)]
@@ -138,7 +170,6 @@ Monkey 3:
 
     pub(crate) fn puzzle_monkeys() -> Vec<Monkey> {
         let str = puzzle_input();
-        println!("{str}");
         parse_all_monkeys_def(str.as_str()).unwrap().1
     }
 }

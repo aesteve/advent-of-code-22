@@ -74,7 +74,7 @@ pub(crate) fn parse_all_monkeys_def(input: &str) -> IResult<&str, Vec<Monkey>> {
 #[cfg(test)]
 mod tests {
     use crate::day_11::parse::{parse_monkey_def, parse_operation};
-    use crate::day_11::tests::sample_monkeys;
+    use crate::day_11::tests::{puzzle_monkeys, sample_monkeys};
     use crate::day_11::{Op, Operation, Term};
 
     #[test]
@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn can_parse_puzzle_input() {
-        let monkeys = sample_monkeys();
+        let monkeys = puzzle_monkeys();
         assert_eq!(8, monkeys.len());
     }
 }
