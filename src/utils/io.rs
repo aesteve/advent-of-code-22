@@ -26,7 +26,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::input_file_lines;
+    use crate::utils::io::input_file_lines;
 
     #[test]
     fn can_read_sample() {

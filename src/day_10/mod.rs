@@ -73,7 +73,7 @@ impl From<&str> for Instruction {
 #[cfg(test)]
 mod tests {
     use crate::day_10::{CpuState, Instruction};
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::{input_file_lines, FileLines};
 
     pub(crate) fn sample() -> Vec<Instruction> {
         vec![

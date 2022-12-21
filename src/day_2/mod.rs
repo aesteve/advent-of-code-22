@@ -92,7 +92,7 @@ impl Round {
 #[cfg(test)]
 mod tests {
     use crate::day_2::Move;
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::{input_file_lines, FileLines};
 
     pub(crate) fn puzzle_input() -> FileLines {
         input_file_lines("day_2.txt").unwrap()

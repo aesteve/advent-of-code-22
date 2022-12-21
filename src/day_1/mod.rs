@@ -10,7 +10,7 @@ pub(crate) fn cals_from_line(line: std::io::Result<String>) -> Option<u32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::{input_file_lines, FileLines};
 
     /// In order to focus on the algorithm / implementation and test it while abstracting from storage
     pub(crate) type Inventories = Vec<Option<u32>>;

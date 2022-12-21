@@ -14,7 +14,7 @@ pub(crate) fn priority(item: char) -> u8 {
 #[cfg(test)]
 mod tests {
     use crate::day_3::priority;
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::{input_file_lines, FileLines};
 
     pub(crate) fn puzzle_input() -> FileLines {
         input_file_lines("day_3.txt").unwrap()

@@ -61,7 +61,7 @@ fn parse<C: Crates, L, I: IntoIterator<Item = L>>(file: I, mapping: fn(L) -> Str
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::{input_file_lines, FileLines};
 
     pub(crate) fn sample() -> Vec<&'static str> {
         vec!["    [D]    ", "[N] [C]    ", "[Z] [M] [P]", "1   2   3", ""]

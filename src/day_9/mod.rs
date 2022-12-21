@@ -1,22 +1,8 @@
-use crate::day_9::Direction::{Down, Left, Right, Up};
+use crate::utils::geom::Direction::{Down, Left, Right, Up};
+use crate::utils::geom::{Coord, Direction};
 
 mod part_1;
 mod part_2;
-mod soluce;
-
-#[derive(Hash, Debug, PartialEq, Eq, Clone, Default)]
-pub(crate) struct Coord {
-    pub(crate) x: i64,
-    pub(crate) y: i64,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub(crate) enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
-}
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub(crate) struct Move {
@@ -94,7 +80,7 @@ impl TryFrom<String> for Move {
 mod tests {
     use crate::day_9::Direction::{Down, Left, Right, Up};
     use crate::day_9::{next_pos, Coord, Move};
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::input_file_lines;
 
     pub(crate) fn puzzle_input() -> Vec<Move> {
         input_file_lines("day_9.txt")

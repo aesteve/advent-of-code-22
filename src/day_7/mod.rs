@@ -1,7 +1,9 @@
 mod part_1;
 mod part_2;
 
-use id_tree::{Children, InsertBehavior, Node, NodeId, Tree};
+use id_tree::InsertBehavior;
+use id_tree::Node;
+use id_tree::Tree;
 use nom::branch::alt;
 use nom::bytes::complete::take_while1;
 use nom::bytes::streaming::tag;
@@ -148,12 +150,14 @@ pub(crate) fn total_size(tree: &Tree<FileDesc>, curr: &Node<FileDesc>) -> u64 {
 
 #[cfg(test)]
 mod tests {
+    use crate::day_7::parse_dir_entry;
+    use crate::day_7::parse_entry_name;
+    use crate::day_7::parse_file_desc;
+    use crate::day_7::parse_line;
+    use crate::day_7::Cmd;
     use crate::day_7::FileDesc::Dir;
-    use crate::day_7::{
-        build_tree, parse_dir_entry, parse_entry_name, parse_file_desc, parse_line, total_size,
-        Cmd, Line,
-    };
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::day_7::Line;
+    use crate::utils::io::{input_file_lines, FileLines};
 
     pub(crate) const SAMPLE: &str = "\
 $ cd /

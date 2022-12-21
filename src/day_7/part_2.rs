@@ -20,9 +20,9 @@ fn candidates_to_deletion(tree: &Tree<FileDesc>, min_threshold: u64) -> Vec<(&St
 
 #[cfg(test)]
 mod tests {
-    use crate::day_7::build_tree;
-    use crate::day_7::part_2::candidates_to_deletion;
-    use crate::day_7::tests::{sample, SAMPLE};
+    // use crate::day_7::build_tree;
+    // use crate::day_7::part_2::candidates_to_deletion;
+    // use crate::day_7::tests::{sample, SAMPLE};
 
     // #[test]
     // fn test_sample() {

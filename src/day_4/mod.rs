@@ -33,7 +33,7 @@ fn parse_range(str: &str) -> RangeInclusive<u32> {
 #[cfg(test)]
 mod tests {
     use crate::day_4::{parse_ranges, RangePair};
-    use crate::utils::{input_file_lines, FileLines};
+    use crate::utils::io::{input_file_lines, FileLines};
 
     pub(crate) fn parse_line(l: std::io::Result<String>) -> RangePair {
         parse_ranges(l.unwrap())
