@@ -63,7 +63,8 @@ mod tests {
     use crate::day_8::part_2::{
         coords_towards, highest_scenic_score, scenic_score, viewing_distance,
     };
-    use crate::day_8::tests::{puzzle_input, puzzle_input_forest, sample, sample_forest};
+    use crate::day_8::tests::puzzle_input_forest;
+    use crate::day_8::tests::sample_forest;
     use crate::day_8::Tree;
     use crate::utils::geom::{Coord, Direction};
 

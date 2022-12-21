@@ -9,6 +9,7 @@ edition = "2021"
 regex = "1.7"
 id_tree = "1.8"
 nom = "7.1"
+linked_hash_set = "0.1"
 
 [dev-dependencies]
 quickcheck = "1"

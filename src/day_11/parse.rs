@@ -6,7 +6,6 @@ use nom::combinator::{map, value};
 use nom::multi::separated_list0;
 use nom::sequence::tuple;
 use nom::IResult;
-use std::collections::VecDeque;
 
 fn parse_term(def: &str) -> IResult<&str, Term> {
     let parse_old = value(Term::Old, tag("old"));
