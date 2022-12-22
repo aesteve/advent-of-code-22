@@ -2,12 +2,25 @@ mod part_1;
 
 use linked_hash_set::LinkedHashSet;
 use std::cmp;
-use std::collections::{HashMap, HashSet}; // just for the sake of keeping the coordinates in order (debugging purposes)
+use std::cmp::{max, min, Ordering};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct Coord {
     x: usize,
     y: usize,
+}
+
+impl Coord {
+    pub(crate) fn distance_to(&self, other: &Coord) -> u64 {
+        let max_x = max(self.x, other.x);
+        let min_x = min(self.x, other.x);
+        let max_y = max(self.y, other.y);
+        let min_y = min(self.y, other.y);
+        let d_x = (max_x - min_x) as f64;
+        let d_y = (max_y - min_y) as f64;
+        (d_x * d_x / d_y * d_y).sqrt().round() as u64
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -104,13 +117,13 @@ fn valid_directions(grid: &Grid, origin: &Coord) -> Vec<Coord> {
 
 fn valid_elevation(origin: char, new: char) -> bool {
     if new == 'E' {
-        return origin == 'z';
+        return origin == 'z' || origin == 'y';
     }
     if new == 'S' {
         return false;
     }
     if origin == 'S' {
-        return new == 'a';
+        return new == 'b' || new == 'a';
     }
     new as u8 <= origin as u8 + 1
 }
@@ -141,7 +154,6 @@ fn allowed_directions(grid: &Grid, origin: &Coord) -> Vec<Coord> {
 
 fn allowed_directions_reverse(grid: &Grid, origin: &Coord) -> Vec<Coord> {
     let origin_elevation = grid.at(origin);
-    println!("elevation: {origin_elevation:?}");
     valid_directions(grid, origin)
         .into_iter()
         .filter(|coord| {
@@ -151,39 +163,111 @@ fn allowed_directions_reverse(grid: &Grid, origin: &Coord) -> Vec<Coord> {
         .collect()
 }
 
-fn walk_to(
+fn walk_to_iter(grid: &Grid, origin: &Coord, dest: &Coord) -> Vec<Vec<Coord>> {
+    let mut visited: HashSet<Coord> = HashSet::new();
+    let mut to_visit: VecDeque<(Coord, Vec<Coord>)> = VecDeque::new();
+    let mut solutions: Vec<Vec<Coord>> = vec![];
+    to_visit.push_back((origin.clone(), vec![]));
+    while let Some((coord, mut traversed_so_far)) = to_visit.pop_front() {
+        if !visited.contains(&coord) {
+            if *dest == coord {
+                solutions.push(traversed_so_far);
+                solutions.sort_by_key(|s| s.len());
+            } else {
+                visited.insert(coord.clone());
+                traversed_so_far.push(coord.clone());
+                // if let Some(solution) = solutions.first() {
+                //     if solution.len() <= traversed_so_far.len() {
+                //         // Stop here, there's no need to go further
+                //         continue;
+                //     }
+                // }
+                if traversed_so_far.len() <= 4 {
+                    let collected = traversed_so_far
+                        .iter()
+                        .map(|c| grid.at(c))
+                        .collect::<String>();
+                    println!("{collected:?}")
+                }
+                for direction in allowed_directions(grid, &coord) {
+                    to_visit.push_back((direction, traversed_so_far.clone()));
+                }
+            }
+        }
+    }
+    solutions
+}
+
+fn walk_to_recursive(
     grid: &Grid,
     origin: &Coord,
+    destination: &Coord,
     visited: &mut HashMap<Coord, usize>,
     traversed: &mut LinkedHashSet<Coord>,
     solutions: &mut Vec<LinkedHashSet<Coord>>,
 ) {
     let mut directions_possible = allowed_directions(grid, origin);
-    directions_possible.sort_by_key(|f| cmp::Reverse(grid.at(f)));
+    directions_possible.sort_by(|coord_1, coord_2| {
+        let c1 = grid.at(coord_1);
+        let c2 = grid.at(coord_2);
+        if c1 > c2 {
+            Ordering::Less
+        } else if c1 < c2 {
+            Ordering::Greater
+        } else {
+            // pick the shortest path geometrically
+            let delta_1 = coord_1.distance_to(destination);
+            let delta_2 = coord_2.distance_to(destination);
+            delta_1.cmp(&delta_2)
+        }
+    });
     for coord in directions_possible {
         let mut traversed_so_far = traversed.clone();
         if traversed_so_far.contains(&coord) {
             continue; // next direction
         }
+        // if visited.contains(&coord) {
+        //     continue; // abort here, we have visited it already
+        // }
+        // println!("visited: {visited:?}");
         if let Some(v) = visited.get(&coord) {
+            println!("Already visited this coords after {v} steps");
             if *v < traversed.len() {
+                println!("  No need to revisit, there's a shorter path to it");
                 continue; // we already visited it with a shorter path
             }
         }
-        if grid.at(&coord) == 'E' {
+        if &coord == destination {
             solutions.push(traversed_so_far.clone());
             solutions.sort_by_key(|f| f.len());
             return;
         }
+        if visited.len() > 1000 {
+            println!("Stopping, too many nodes visited");
+            return;
+        }
+        // let collected = traversed_so_far
+        //     .iter()
+        //     .map(|c| grid.at(c))
+        //     .collect::<String>();
+        // println!("collected: {collected:?}");
         traversed_so_far.insert(coord.clone());
+        // visited.insert(coord.clone());
         let v = visited.entry(coord.clone()).or_insert(usize::MAX);
-        *v = cmp::min(*v, traversed.len());
+        *v = min(*v, traversed.len());
         if let Some(found) = solutions.first() {
             if traversed_so_far.len() > found.len() {
                 break;
             }
         }
-        walk_to(grid, &coord, visited, &mut traversed_so_far, solutions);
+        walk_to_recursive(
+            grid,
+            &coord,
+            destination,
+            visited,
+            &mut traversed_so_far,
+            solutions,
+        );
     }
 }
 
@@ -218,10 +302,12 @@ fn walk_from(
 pub(crate) fn paths(grid: &Grid) -> Vec<LinkedHashSet<Coord>> {
     let mut solutions = vec![];
     let mut traversed = LinkedHashSet::new();
-    walk_to(
+    walk_to_recursive(
         grid,
         &grid.start(),
+        &grid.end(),
         &mut HashMap::new(),
+        // &mut HashSet::new(),
         &mut traversed,
         &mut solutions,
     );
@@ -238,8 +324,8 @@ pub(crate) fn paths_rev(grid: &Grid) -> Vec<LinkedHashSet<Coord>> {
 #[cfg(test)]
 mod tests {
     use crate::day_12::{
-        allowed_directions, allowed_directions_reverse, paths, paths_rev, valid_elevation, walk_to,
-        Coord, Grid,
+        allowed_directions, allowed_directions_reverse, paths, paths_rev, valid_elevation,
+        walk_to_iter, walk_to_recursive, Coord, Grid,
     };
     use crate::utils::io::input_file_lines;
 
@@ -312,13 +398,24 @@ mod tests {
     }
 
     #[test]
-    fn check_walk_to() {
+    fn check_walk_to_recursive() {
         let grid = sample();
         let solutions = paths(&grid);
         let s = solutions.first().unwrap();
         let collected = s.iter().map(|coord| grid.at(coord)).collect::<String>();
         assert_eq!("abcccdefghijklmnopqrstuvwxxxyz".to_string(), collected);
         let len = s.len() + 1;
+        assert_eq!(31, len);
+    }
+
+    #[test]
+    fn check_walk_to_iter() {
+        let grid = sample();
+        let solutions = walk_to_iter(&grid, &grid.start(), &grid.end());
+        let s = solutions.first().unwrap();
+        let collected = s.iter().map(|coord| grid.at(coord)).collect::<String>();
+        assert_eq!("Sabcccdefghijklmnopqrstuvwxxxyz".to_string(), collected);
+        let len = s.len();
         assert_eq!(31, len);
     }
 
